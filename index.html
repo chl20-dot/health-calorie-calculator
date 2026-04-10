@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4F46E5">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>健康减肥热量计算器</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        neutral: '#6B7280',
+                        'neutral-light': '#F3F4F6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            }
+            .input-focus {
+                @apply focus:ring-2 focus:ring-primary focus:border-transparent;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-primary text-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl font-bold flex items-center">
+                <i class="fa fa-heartbeat mr-2"></i>
+                健康减肥热量计算器
+            </h1>
+            <div class="hidden md:flex space-x-4">
+                <a href="#calculator" class="hover:text-accent transition-colors">热量计算</a>
+                <a href="#tips" class="hover:text-accent transition-colors">减肥建议</a>
+                <a href="#about" class="hover:text-accent transition-colors">关于我们</a>
+            </div>
+            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-primary">
+            <div class="container mx-auto px-4 py-2 space-y-2">
+                <a href="#calculator" class="block py-2 hover:text-accent transition-colors">热量计算</a>
+                <a href="#tips" class="block py-2 hover:text-accent transition-colors">减肥建议</a>
+                <a href="#about" class="block py-2 hover:text-accent transition-colors">关于我们</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 英雄区 -->
+        <section class="bg-gradient-to-r from-primary to-secondary text-white rounded-xl p-8 mb-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">科学减肥，健康生活</h2>
+            <p class="text-lg mb-6">通过计算每日消耗热量，制定合理的减肥计划，实现健康减重目标</p>
+            <a href="#calculator" class="bg-white text-primary font-semibold py-3 px-6 rounded-full hover:bg-gray-100 transition-colors inline-block">
+                开始计算
+            </a>
+        </section>
+
+        <!-- 热量计算器 -->
+        <section id="calculator" class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">热量消耗计算器</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 基本信息输入 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="age">年龄</label>
+                        <input type="number" id="age" min="1" max="100" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="gender">性别</label>
+                        <select id="gender" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="height">身高 (cm)</label>
+                        <input type="number" id="height" min="50" max="250" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="weight">体重 (kg)</label>
+                        <input type="number" id="weight" min="20" max="300" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="activity">活动水平</label>
+                        <select id="activity" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="1.2">久坐不动（几乎不运动）</option>
+                            <option value="1.375">轻度活动（每周1-3次运动）</option>
+                            <option value="1.55">中度活动（每周3-5次运动）</option>
+                            <option value="1.725">重度活动（每周6-7次运动）</option>
+                            <option value="1.9">极重度活动（专业运动员）</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 计算结果 -->
+                <div class="bg-neutral-light rounded-lg p-6 flex flex-col justify-center">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-800">计算结果</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">基础代谢率 (BMR):</span>
+                            <span id="bmr-result" class="font-semibold text-primary">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">每日总消耗热量 (TDEE):</span>
+                            <span id="tdee-result" class="font-semibold text-primary">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">健康减肥每日摄入:</span>
+                            <span id="calorie-result" class="font-semibold text-secondary">0</span>
+                        </div>
+                        <div class="mt-6">
+                            <button id="calculate-btn" class="w-full bg-primary text-white font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors">
+                                计算
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 运动热量消耗 -->
+        <section class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">运动热量消耗</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 运动输入 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="exercise">运动类型</label>
+                        <select id="exercise" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="3.5">步行 (3.5 mph)</option>
+                            <option value="4.5">快走 (4.5 mph)</option>
+                            <option value="5.0">慢跑 (5 mph)</option>
+                            <option value="8.0">跑步 (8 mph)</option>
+                            <option value="6.0">骑自行车 (12-14 mph)</option>
+                            <option value="8.0">游泳 (自由泳)</option>
+                            <option value="10.0">跳绳</option>
+                            <option value="5.5">有氧健身操</option>
+                            <option value="7.0">篮球</option>
+                            <option value="6.0">足球</option>
+                            <option value="8.0">爬楼梯</option>
+                            <option value="4.0">瑜伽</option>
+                            <option value="5.0">普拉提</option>
+                            <option value="7.5">羽毛球</option>
+                            <option value="6.5">乒乓球</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="exercise-input-type">输入方式</label>
+                        <select id="exercise-input-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="time">时间 (分钟)</option>
+                            <option value="distance">距离 (公里)</option>
+                        </select>
+                    </div>
+                    <div id="time-input">
+                        <label class="block text-gray-700 font-medium mb-2" for="exercise-time">运动时间 (分钟)</label>
+                        <input type="number" id="exercise-time" min="1" max="300" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div id="distance-input" class="hidden">
+                        <label class="block text-gray-700 font-medium mb-2" for="exercise-distance">运动距离 (公里)</label>
+                        <input type="number" id="exercise-distance" min="0.1" step="0.1" max="100" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                </div>
+                
+                <!-- 运动消耗结果 -->
+                <div class="bg-neutral-light rounded-lg p-6 flex flex-col justify-center">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-800">运动消耗</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">预计消耗热量:</span>
+                            <span id="exercise-result" class="font-semibold text-accent">0</span>
+                        </div>
+                        <div class="mt-6">
+                            <button id="exercise-btn" class="w-full bg-accent text-white font-semibold py-3 px-6 rounded-lg hover:bg-accent/90 transition-colors">
+                                计算
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 饮食热量计算 -->
+        <section class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">饮食热量计算</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 食物输入 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="food-name">食物名称</label>
+                        <input type="text" id="food-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="food-calories">每100g热量 (大卡)</label>
+                        <input type="number" id="food-calories" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">分量</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <select id="food-unit" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                                    <option value="g">克 (g)</option>
+                                    <option value="piece">个</option>
+                                    <option value="bowl">碗</option>
+                                    <option value="slice">片</option>
+                                    <option value="cup">杯</option>
+                                    <option value="plate">盘</option>
+                                </select>
+                            </div>
+                            <div>
+                                <input type="number" id="food-amount" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 照片上传区域 -->
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">从照片计算热量</label>
+                        <div class="flex flex-col md:flex-row items-center gap-4">
+                            <div class="w-full md:w-1/2">
+                                <input type="file" id="food-photo" accept="image/*" class="w-full text-sm text-gray-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-lg file:border-0
+                                    file:text-sm file:font-medium
+                                    file:bg-accent file:text-white
+                                    hover:file:bg-accent-hover
+                                    transition-colors
+                                ">
+                            </div>
+                            <div class="w-full md:w-1/2">
+                                <div id="photo-preview" class="w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                                    <p class="text-gray-500 text-sm">上传照片预览</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="calculate-from-photo" class="mt-3 bg-accent hover:bg-accent-hover text-white font-medium py-2 px-4 rounded-lg transition-colors w-full md:w-auto">
+                            从照片计算
+                        </button>
+                    </div>
+                    <div class="mt-6">
+                        <button id="add-food-btn" class="w-full bg-secondary text-white font-semibold py-3 px-6 rounded-lg hover:bg-secondary/90 transition-colors">
+                            添加食物
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 食物列表和总计 -->
+                <div class="bg-neutral-light rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-800">今日饮食</h3>
+                    <div class="mb-4 max-h-60 overflow-y-auto">
+                        <table class="w-full bg-white rounded-lg">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="px-4 py-2 text-left text-gray-700">食物</th>
+                                    <th class="px-4 py-2 text-right text-gray-700">热量</th>
+                                    <th class="px-4 py-2 text-center text-gray-700">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="food-list">
+                                <!-- 食物列表将通过JavaScript动态添加 -->
+                                <tr>
+                                    <td colspan="3" class="px-4 py-4 text-center text-gray-500">
+                                        还没有添加食物
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700 font-semibold">总摄入热量:</span>
+                            <span id="total-calories" class="font-semibold text-accent">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700 font-semibold">建议摄入热量:</span>
+                            <span id="recommended-calories" class="font-semibold text-secondary">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700 font-semibold">热量差额:</span>
+                            <span id="calorie-balance" class="font-semibold">0</span>
+                        </div>
+                        <div class="mt-6">
+                            <button id="clear-food-btn" class="w-full bg-gray-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors">
+                                清空列表
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 喝水量追踪 -->
+        <section class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">喝水量追踪</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 喝水量输入 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="water-intake">今日饮水量 (ml)</label>
+                        <input type="number" id="water-intake" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div class="mt-6">
+                        <button id="update-water-btn" class="w-full bg-primary text-white font-semibold py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors">
+                            更新饮水量
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 喝水量结果 -->
+                <div class="bg-neutral-light rounded-lg p-6 flex flex-col justify-center">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-800">饮水情况</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">当前饮水量:</span>
+                            <span id="current-water" class="font-semibold text-primary">0 ml</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">建议饮水量:</span>
+                            <span id="recommended-water" class="font-semibold text-secondary">2000 ml</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">饮水完成率:</span>
+                            <span id="water-progress" class="font-semibold">0%</span>
+                        </div>
+                        <div class="mt-4">
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div id="water-progress-bar" class="bg-primary h-4 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-blue-700 mb-2">饮水小贴士</h4>
+                                <ul class="space-y-1 text-sm text-blue-600">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-tint mt-1 mr-2"></i>
+                                        <span>每天至少喝2000ml水，有助于代谢</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-tint mt-1 mr-2"></i>
+                                        <span>饭前喝水可以增加饱腹感，减少食量</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-tint mt-1 mr-2"></i>
+                                        <span>运动前后及时补充水分</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-tint mt-1 mr-2"></i>
+                                        <span>尽量选择温水，避免过多饮用含糖饮料</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 体重和体脂量追踪 -->
+        <section class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">体重和体脂量追踪</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 体重和体脂量输入 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="weight-date">日期</label>
+                        <input type="date" id="weight-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="current-weight">体重 (kg)</label>
+                        <input type="number" id="current-weight" min="30" max="200" step="0.1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="body-fat">体脂率 (%)</label>
+                        <input type="number" id="body-fat" min="5" max="50" step="0.1" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div class="mt-6">
+                        <button id="add-weight-btn" class="w-full bg-secondary text-white font-semibold py-3 px-6 rounded-lg hover:bg-secondary/90 transition-colors">
+                            添加记录
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 体重和体脂量历史记录 -->
+                <div class="bg-neutral-light rounded-lg p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-800">历史记录</h3>
+                    <div class="mb-4 max-h-60 overflow-y-auto">
+                        <table class="w-full bg-white rounded-lg">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="px-4 py-2 text-left text-gray-700">日期</th>
+                                    <th class="px-4 py-2 text-right text-gray-700">体重 (kg)</th>
+                                    <th class="px-4 py-2 text-right text-gray-700">体脂率 (%)</th>
+                                    <th class="px-4 py-2 text-center text-gray-700">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="weight-history">
+                                <!-- 体重记录将通过JavaScript动态添加 -->
+                                <tr>
+                                    <td colspan="4" class="px-4 py-4 text-center text-gray-500">
+                                        还没有添加记录
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700 font-semibold">最新体重:</span>
+                            <span id="latest-weight" class="font-semibold text-primary">0 kg</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700 font-semibold">最新体脂率:</span>
+                            <span id="latest-body-fat" class="font-semibold text-primary">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700 font-semibold">体重变化:</span>
+                            <span id="weight-change" class="font-semibold">0 kg</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700 font-semibold">体脂率变化:</span>
+                            <span id="body-fat-change" class="font-semibold">0%</span>
+                        </div>
+                        <div class="mt-6">
+                            <button id="clear-weight-btn" class="w-full bg-gray-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-600 transition-colors">
+                                清空记录
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热门减脂操代谢计算 -->
+        <section class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">热门减脂操代谢计算</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 减脂操输入 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="workout">减脂操类型</label>
+                        <select id="workout" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                            <option value="7.0">帕梅拉15分钟全身燃脂</option>
+                            <option value="6.5">周六野20分钟HIIT</option>
+                            <option value="7.5">刘畊宏30分钟本草纲目</option>
+                            <option value="6.0">郑多燕小红帽</option>
+                            <option value="8.0">insanity 30分钟</option>
+                            <option value="5.5">瑜伽燃脂流</option>
+                            <option value="7.0"> Zumba尊巴</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2" for="workout-time">运动时间 (分钟)</label>
+                        <input type="number" id="workout-time" min="1" max="120" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus">
+                    </div>
+                    <div class="mt-6">
+                        <button id="workout-btn" class="w-full bg-accent text-white font-semibold py-3 px-6 rounded-lg hover:bg-accent/90 transition-colors">
+                            计算
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 减脂操结果 -->
+                <div class="bg-neutral-light rounded-lg p-6 flex flex-col justify-center">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-gray-800">代谢消耗</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">预计消耗热量:</span>
+                            <span id="workout-result" class="font-semibold text-accent">0 大卡</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span class="text-gray-700">代谢提升:</span>
+                            <span id="metabolism-boost" class="font-semibold text-secondary">5-10%</span>
+                        </div>
+                        <div class="mt-6">
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-green-700 mb-2">减脂操小贴士</h4>
+                                <ul class="space-y-1 text-sm text-green-600">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle mt-1 mr-2"></i>
+                                        <span>开始前进行5-10分钟热身</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle mt-1 mr-2"></i>
+                                        <span>根据自身能力调整动作难度</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle mt-1 mr-2"></i>
+                                        <span>运动后进行拉伸放松</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle mt-1 mr-2"></i>
+                                        <span>保持规律运动，每周3-5次</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 减肥建议 -->
+        <section id="tips" class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">健康减肥建议</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 饮食建议 -->
+                <div class="bg-neutral-light rounded-lg p-6">
+                    <div class="text-primary text-3xl mb-4 text-center">
+                        <i class="fa fa-cutlery"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-center">饮食建议</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>控制总热量摄入，每日热量缺口不超过500大卡</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>增加蛋白质摄入，占总热量的20-30%</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>多吃蔬菜和水果，提供膳食纤维</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>选择健康脂肪，如橄榄油、坚果等</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>控制碳水化合物摄入，选择复杂碳水</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 运动建议 -->
+                <div class="bg-neutral-light rounded-lg p-6">
+                    <div class="text-primary text-3xl mb-4 text-center">
+                        <i class="fa fa-running"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-center">运动建议</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>每周进行150分钟中等强度有氧运动</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>每周2-3次力量训练，增加肌肉量</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>每天至少步行8000-10000步</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>避免久坐，每小时起身活动5分钟</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>逐渐增加运动强度，避免过度疲劳</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 生活建议 -->
+                <div class="bg-neutral-light rounded-lg p-6">
+                    <div class="text-primary text-3xl mb-4 text-center">
+                        <i class="fa fa-bed"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-center">生活建议</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>保证充足睡眠，每晚7-8小时</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>减少压力，学会放松技巧</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>多喝水，每天至少2000ml</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>记录饮食和运动情况，追踪进度</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>保持耐心，健康减肥是一个长期过程</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于我们 -->
+        <section id="about" class="bg-white rounded-xl p-6 mb-8 card-shadow">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">关于我们</h2>
+            <div class="text-center max-w-2xl mx-auto">
+                <p class="text-gray-700 mb-4">健康减肥热量计算器是一个免费的在线工具，旨在帮助用户通过科学的方法计算每日热量消耗和运动消耗，从而制定合理的减肥计划。</p>
+                <p class="text-gray-700 mb-4">我们的计算基于国际通用的公式，包括基础代谢率(BMR)和总消耗热量(TDEE)的计算，以及各种运动的热量消耗计算。</p>
+                <p class="text-gray-700">我们希望通过这个工具，帮助更多人实现健康减肥的目标，建立健康的生活方式。</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <p class="mb-2">© 2024 健康减肥热量计算器</p>
+                <p class="text-gray-400 text-sm">本工具仅供参考，具体减肥计划请咨询专业人士</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 计算基础代谢率和总消耗热量
+        document.getElementById('calculate-btn').addEventListener('click', function() {
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const height = parseInt(document.getElementById('height').value);
+            const weight = parseInt(document.getElementById('weight').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            
+            if (!age || !height || !weight) {
+                alert('请填写完整的个人信息');
+                return;
+            }
+            
+            let bmr;
+            // 使用Mifflin-St Jeor公式计算BMR
+            if (gender === 'male') {
+                bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+            } else {
+                bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+            }
+            
+            const tdee = bmr * activity;
+            const calorieIntake = tdee - 500; // 健康减肥每日热量缺口500大卡
+            
+            document.getElementById('bmr-result').textContent = Math.round(bmr) + ' 大卡';
+            document.getElementById('tdee-result').textContent = Math.round(tdee) + ' 大卡';
+            document.getElementById('calorie-result').textContent = Math.round(calorieIntake) + ' 大卡';
+        });
+        
+        // 计算运动消耗热量
+        // 计算运动消耗热量
+        // 运动速度映射表（公里/小时）- 使用运动类型文本作为键
+        const exerciseSpeeds = {
+            '步行 (3.5 mph)': 5.6, // 步行
+            '快走 (4.5 mph)': 7.2, // 快走
+            '慢跑 (5 mph)': 8.0, // 慢跑
+            '跑步 (8 mph)': 12.8, // 跑步
+            '骑自行车 (12-14 mph)': 19.2, // 骑自行车
+            '游泳 (自由泳)': 3.2, // 游泳
+            '跳绳': 10.0, // 跳绳
+            '有氧健身操': 5.0, // 有氧健身操
+            '篮球': 7.0, // 篮球
+            '足球': 6.0, // 足球
+            '爬楼梯': 4.0, // 爬楼梯
+            '瑜伽': 2.0, // 瑜伽
+            '普拉提': 2.5, // 普拉提
+            '羽毛球': 6.0, // 羽毛球
+            '乒乓球': 5.0 // 乒乓球
+        };
+        
+        // 切换输入方式
+        document.getElementById('exercise-input-type').addEventListener('change', function() {
+            const inputType = this.value;
+            if (inputType === 'time') {
+                document.getElementById('time-input').classList.remove('hidden');
+                document.getElementById('distance-input').classList.add('hidden');
+            } else {
+                document.getElementById('time-input').classList.add('hidden');
+                document.getElementById('distance-input').classList.remove('hidden');
+            }
+        });
+        
+        document.getElementById('exercise-btn').addEventListener('click', function() {
+            const exerciseSelect = document.getElementById('exercise');
+            const exercise = parseFloat(exerciseSelect.value);
+            const exerciseType = exerciseSelect.options[exerciseSelect.selectedIndex].text;
+            const inputType = document.getElementById('exercise-input-type').value;
+            const weight = parseInt(document.getElementById('weight').value);
+            
+            if (!weight) {
+                alert('请填写体重信息');
+                return;
+            }
+            
+            let exerciseTime;
+            if (inputType === 'time') {
+                exerciseTime = parseInt(document.getElementById('exercise-time').value);
+                if (!exerciseTime) {
+                    alert('请填写运动时间');
+                    return;
+                }
+            } else {
+                const distance = parseFloat(document.getElementById('exercise-distance').value);
+                if (!distance) {
+                    alert('请填写运动距离');
+                    return;
+                }
+                // 根据运动类型的速度计算时间（小时）
+                const speed = exerciseSpeeds[exerciseType] || 5.0; // 默认速度
+                exerciseTime = (distance / speed) * 60; // 转换为分钟
+            }
+            
+            // 运动消耗热量计算公式：消耗热量 = 梅脱值 * 体重(kg) * 时间(小时)
+            const caloriesBurned = exercise * weight * (exerciseTime / 60);
+            
+            document.getElementById('exercise-result').textContent = Math.round(caloriesBurned) + ' 大卡';
+        });
+        
+        // 饮食热量计算
+        let foodList = [];
+        let recommendedCalories = 0;
+        
+        // 更新建议摄入热量
+        function updateRecommendedCalories() {
+            const calorieResult = document.getElementById('calorie-result').textContent;
+            if (calorieResult !== '0') {
+                recommendedCalories = parseInt(calorieResult);
+                document.getElementById('recommended-calories').textContent = recommendedCalories + ' 大卡';
+                updateCalorieBalance();
+            }
+        }
+        
+        // 计算总摄入热量
+        function calculateTotalCalories() {
+            const total = foodList.reduce((sum, food) => sum + food.calories, 0);
+            document.getElementById('total-calories').textContent = Math.round(total) + ' 大卡';
+            updateCalorieBalance();
+        }
+        
+        // 更新热量差额
+        function updateCalorieBalance() {
+            const totalCalories = parseInt(document.getElementById('total-calories').textContent) || 0;
+            const balance = recommendedCalories - totalCalories;
+            const balanceElement = document.getElementById('calorie-balance');
+            balanceElement.textContent = balance + ' 大卡';
+            
+            // 根据热量差额设置颜色
+            if (balance > 0) {
+                balanceElement.className = 'font-semibold text-secondary';
+            } else if (balance < 0) {
+                balanceElement.className = 'font-semibold text-red-500';
+            } else {
+                balanceElement.className = 'font-semibold text-primary';
+            }
+        }
+        
+        // 渲染食物列表
+        function renderFoodList() {
+            const foodListElement = document.getElementById('food-list');
+            
+            if (foodList.length === 0) {
+                foodListElement.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="px-4 py-4 text-center text-gray-500">
+                            还没有添加食物
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            foodListElement.innerHTML = foodList.map((food, index) => `
+                <tr class="border-b border-gray-200">
+                    <td class="px-4 py-2">${food.name} (${food.amount}g)</td>
+                    <td class="px-4 py-2 text-right">${Math.round(food.calories)}</td>
+                    <td class="px-4 py-2 text-center">
+                        <button class="text-red-500 hover:text-red-700" onclick="removeFood(${index})">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // 添加食物
+        document.getElementById('add-food-btn').addEventListener('click', function() {
+            const foodName = document.getElementById('food-name').value;
+            const foodCalories = parseFloat(document.getElementById('food-calories').value);
+            const foodAmount = parseFloat(document.getElementById('food-amount').value);
+            const foodUnit = document.getElementById('food-unit').value;
+            
+            if (!foodName || !foodCalories || !foodAmount) {
+                alert('请填写完整的食物信息');
+                return;
+            }
+            
+            // 计算食物热量（基于100g）
+            const calories = (foodCalories / 100) * foodAmount;
+            
+            // 添加到食物列表
+            foodList.push({ 
+                name: foodName, 
+                calories: calories, 
+                amount: foodAmount, 
+                unit: foodUnit 
+            });
+            
+            // 清空输入框
+            document.getElementById('food-name').value = '';
+            document.getElementById('food-calories').value = '';
+            document.getElementById('food-amount').value = '';
+            document.getElementById('food-unit').value = 'g';
+            
+            // 渲染列表和更新计算
+            renderFoodList();
+            calculateTotalCalories();
+        });
+        
+        // 移除食物
+        window.removeFood = function(index) {
+            foodList.splice(index, 1);
+            renderFoodList();
+            calculateTotalCalories();
+        };
+        
+        // 清空食物列表
+        document.getElementById('clear-food-btn').addEventListener('click', function() {
+            foodList = [];
+            renderFoodList();
+            calculateTotalCalories();
+        });
+        
+        // 当计算基础代谢率时，更新建议摄入热量
+        document.getElementById('calculate-btn').addEventListener('click', function() {
+            // 原有计算逻辑...
+            // 这里会重新计算建议摄入热量，所以需要更新
+            setTimeout(updateRecommendedCalories, 100);
+        });
+        
+        // 渲染食物列表
+        function renderFoodList() {
+            const foodListElement = document.getElementById('food-list');
+            
+            if (foodList.length === 0) {
+                foodListElement.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="px-4 py-4 text-center text-gray-500">
+                            还没有添加食物
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            foodListElement.innerHTML = foodList.map((food, index) => `
+                <tr class="border-b border-gray-200">
+                    <td class="px-4 py-2">${food.name} (${food.amount}${getUnitLabel(food.unit)})</td>
+                    <td class="px-4 py-2 text-right">${Math.round(food.calories)}</td>
+                    <td class="px-4 py-2 text-center">
+                        <button class="text-red-500 hover:text-red-700" onclick="removeFood(${index})">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // 获取单位标签
+        function getUnitLabel(unit) {
+            const unitLabels = {
+                'g': 'g',
+                'piece': '个',
+                'bowl': '碗',
+                'slice': '片',
+                'cup': '杯',
+                'plate': '盘'
+            };
+            return unitLabels[unit] || unit;
+        }
+        
+        // 照片上传处理（更新为新的元素ID）
+        const foodPhotoInput = document.getElementById('food-photo');
+        const photoPreview = document.getElementById('photo-preview');
+        
+        if (foodPhotoInput && photoPreview) {
+            foodPhotoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        photoPreview.innerHTML = `<img src="${e.target.result}" alt="食物照片" class="w-full h-full object-cover rounded-lg">`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    photoPreview.innerHTML = '<p class="text-gray-500 text-sm">上传照片预览</p>';
+                }
+            });
+        }
+        
+        // 从照片计算热量（更新为新的元素ID）
+        const calculateFromPhotoBtn = document.getElementById('calculate-from-photo');
+        
+        if (calculateFromPhotoBtn) {
+            calculateFromPhotoBtn.addEventListener('click', function() {
+                // 模拟从照片识别食物和计算热量
+                // 实际应用中，这里会调用API进行食物识别
+                const mockFoods = [
+                    { name: '苹果', calories: 52, amount: 1, unit: 'piece' },
+                    { name: '米饭', calories: 130, amount: 1, unit: 'bowl' },
+                    { name: '鸡蛋', calories: 78, amount: 1, unit: 'piece' },
+                    { name: '面包', calories: 265, amount: 2, unit: 'slice' }
+                ];
+                
+                // 随机选择一个模拟食物
+                const randomFood = mockFoods[Math.floor(Math.random() * mockFoods.length)];
+                
+                // 显示识别结果
+                if (confirm(`识别结果：${randomFood.name} (${randomFood.amount}${getUnitLabel(randomFood.unit)})\n热量：${randomFood.calories} 大卡\n是否添加到食物列表？`)) {
+                    // 添加到食物列表
+                    foodList.push(randomFood);
+                    
+                    // 重置照片预览
+                    if (photoPreview) {
+                        photoPreview.innerHTML = '<p class="text-gray-500 text-sm">上传照片预览</p>';
+                    }
+                    if (foodPhotoInput) {
+                        foodPhotoInput.value = '';
+                    }
+                    
+                    // 渲染列表和更新计算
+                    renderFoodList();
+                    calculateTotalCalories();
+                }
+            });
+        }
+        
+        // 喝水量追踪
+        let currentWater = 0;
+        const recommendedWater = 2000; // 建议每日饮水量2000ml
+        
+        // 更新饮水量
+        document.getElementById('update-water-btn').addEventListener('click', function() {
+            const waterIntake = parseInt(document.getElementById('water-intake').value);
+            
+            if (waterIntake < 0) {
+                alert('饮水量不能为负数');
+                return;
+            }
+            
+            currentWater = waterIntake;
+            updateWaterStatus();
+            
+            // 清空输入框
+            document.getElementById('water-intake').value = '';
+        });
+        
+        // 更新饮水状态
+        function updateWaterStatus() {
+            document.getElementById('current-water').textContent = currentWater + ' ml';
+            
+            // 计算完成率
+            const progress = Math.min((currentWater / recommendedWater) * 100, 100);
+            document.getElementById('water-progress').textContent = Math.round(progress) + '%';
+            
+            // 更新进度条
+            document.getElementById('water-progress-bar').style.width = progress + '%';
+            
+            // 根据完成率设置进度条颜色
+            const progressBar = document.getElementById('water-progress-bar');
+            if (progress < 50) {
+                progressBar.className = 'bg-red-500 h-4 rounded-full';
+            } else if (progress < 100) {
+                progressBar.className = 'bg-yellow-500 h-4 rounded-full';
+            } else {
+                progressBar.className = 'bg-green-500 h-4 rounded-full';
+            }
+        }
+        
+        // 热门减脂操代谢计算
+        document.getElementById('workout-btn').addEventListener('click', function() {
+            const workout = parseFloat(document.getElementById('workout').value);
+            const workoutTime = parseInt(document.getElementById('workout-time').value);
+            const weight = parseInt(document.getElementById('weight').value);
+            
+            if (!workoutTime || !weight) {
+                alert('请填写完整的运动信息和体重');
+                return;
+            }
+            
+            // 运动消耗热量计算公式：消耗热量 = 梅脱值 * 体重(kg) * 时间(小时)
+            const caloriesBurned = workout * weight * (workoutTime / 60);
+            
+            document.getElementById('workout-result').textContent = Math.round(caloriesBurned) + ' 大卡';
+        });
+        
+        // 体重和体脂量追踪
+        let weightHistory = [];
+        
+        // 添加体重记录
+        document.getElementById('add-weight-btn').addEventListener('click', function() {
+            const date = document.getElementById('weight-date').value;
+            const weight = parseFloat(document.getElementById('current-weight').value);
+            const bodyFat = parseFloat(document.getElementById('body-fat').value);
+            
+            if (!date || !weight || !bodyFat) {
+                alert('请填写完整的体重和体脂量信息');
+                return;
+            }
+            
+            // 添加记录到历史
+            weightHistory.push({ date, weight, bodyFat });
+            
+            // 按日期排序（最新的在前面）
+            weightHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // 更新历史记录表格
+            updateWeightHistory();
+            
+            // 更新最新数据和变化
+            updateWeightStats();
+            
+            // 清空输入
+            document.getElementById('weight-date').value = '';
+            document.getElementById('current-weight').value = '';
+            document.getElementById('body-fat').value = '';
+        });
+        
+        // 清空体重记录
+        document.getElementById('clear-weight-btn').addEventListener('click', function() {
+            if (confirm('确定要清空所有体重记录吗？')) {
+                weightHistory = [];
+                updateWeightHistory();
+                updateWeightStats();
+            }
+        });
+        
+        // 更新体重历史记录表格
+        function updateWeightHistory() {
+            const weightHistoryEl = document.getElementById('weight-history');
+            
+            if (weightHistory.length === 0) {
+                weightHistoryEl.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-4 py-4 text-center text-gray-500">
+                            还没有添加记录
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            weightHistoryEl.innerHTML = weightHistory.map((record, index) => `
+                <tr class="border-b border-gray-200">
+                    <td class="px-4 py-2 text-gray-700">${record.date}</td>
+                    <td class="px-4 py-2 text-right text-gray-700">${record.weight.toFixed(1)}</td>
+                    <td class="px-4 py-2 text-right text-gray-700">${record.bodyFat.toFixed(1)}</td>
+                    <td class="px-4 py-2 text-center">
+                        <button class="text-red-500 hover:text-red-700" onclick="removeWeightRecord(${index})">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // 移除体重记录
+        function removeWeightRecord(index) {
+            weightHistory.splice(index, 1);
+            updateWeightHistory();
+            updateWeightStats();
+        }
+        
+        // 更新体重统计信息
+        function updateWeightStats() {
+            if (weightHistory.length === 0) {
+                document.getElementById('latest-weight').textContent = '0 kg';
+                document.getElementById('latest-body-fat').textContent = '0%';
+                document.getElementById('weight-change').textContent = '0 kg';
+                document.getElementById('body-fat-change').textContent = '0%';
+                return;
+            }
+            
+            // 最新记录
+            const latestRecord = weightHistory[0];
+            document.getElementById('latest-weight').textContent = latestRecord.weight.toFixed(1) + ' kg';
+            document.getElementById('latest-body-fat').textContent = latestRecord.bodyFat.toFixed(1) + '%';
+            
+            // 计算变化（与最早记录比较）
+            if (weightHistory.length > 1) {
+                const firstRecord = weightHistory[weightHistory.length - 1];
+                const weightChange = latestRecord.weight - firstRecord.weight;
+                const bodyFatChange = latestRecord.bodyFat - firstRecord.bodyFat;
+                
+                // 显示变化，负数表示减少（好的）
+                const weightChangeText = weightChange.toFixed(1) + ' kg';
+                const bodyFatChangeText = bodyFatChange.toFixed(1) + '%';
+                
+                const weightChangeEl = document.getElementById('weight-change');
+                const bodyFatChangeEl = document.getElementById('body-fat-change');
+                
+                weightChangeEl.textContent = weightChangeText;
+                bodyFatChangeEl.textContent = bodyFatChangeText;
+                
+                // 设置颜色：减少为绿色，增加为红色
+                weightChangeEl.className = 'font-semibold ' + (weightChange < 0 ? 'text-green-600' : 'text-red-600');
+                bodyFatChangeEl.className = 'font-semibold ' + (bodyFatChange < 0 ? 'text-green-600' : 'text-red-600');
+            } else {
+                document.getElementById('weight-change').textContent = '0 kg';
+                document.getElementById('body-fat-change').textContent = '0%';
+            }
+        }
+        
+        // 移动导航菜单
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        // 关闭移动菜单（当点击菜单项时）
+        if (mobileMenu) {
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        }
+    </script>
+</body>
+</html>
